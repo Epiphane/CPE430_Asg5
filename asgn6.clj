@@ -7,3 +7,9 @@
 (func 3)
 
 (assert true)
+
+;; Protocols (ExprC?!?)
+(defprofocol ExprC)
+
+(deftype numC [n]
+  ExprC)
