@@ -112,7 +112,6 @@
 ;;; Processes a list of arguments.
 (defn processArgs [args env]
   (cond
-    ; (empty? args) (empty '((numV. 1)))
     (empty? args) '()
     :else (cons (interp (first args) env) (processArgs (rest args) env))))
 
