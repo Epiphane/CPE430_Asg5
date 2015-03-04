@@ -3,6 +3,19 @@
 
 (load-file "asgn6.clj")
 
+;;;;;;;;;;;;;;;;;;;
+;;; PARSE TESTS ;;;
+;;;;;;;;;;;;;;;;;;;
+
+(is (= (asgn6/parse '1) (asgn6.numC. 1)))
+(is (= (asgn6/parse 'true) (asgn6.boolC. true)))
+(is (= (asgn6/parse 'x) (asgn6.idC. 'x)))
+(is (= (asgn6/parse '(if true 1 2)) (asgn6.ifC. (asgn6.boolC. true) (asgn6.numC. 1) (asgn6.numC. 2))))
+
+;;;;;;;;;;;;;;;;;;;;;;
+;;; TOP-EVAL TESTS ;;;
+;;;;;;;;;;;;;;;;;;;;;;
+
 (is (= (asgn6/top-eval '(if true 1 2)) "1"))
 (is (= (asgn6/top-eval '(if false 1 2)) "2"))
 (is (= (asgn6/top-eval '((fn (x) (+ x 1)) 2)) "3"))

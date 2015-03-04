@@ -4,24 +4,39 @@
 (declare parse)
 (declare interp)
 
-(defn testType [result expType]
-  (cond
-    (= (type result) expType) "GOOD"
-    :else "=====BAD====="))
-(defn testValue [result expected]
-  (cond
-    (= result expected) "GOOD"
-    :else "=====BAD====="))
+;;;;;;;;;;;;;;;;;;;;;;;;
+;;; TYPE DEFINITIONS ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;; Expression datatype
 (deftype ExprC [])
-(deftype numC [val])
-(deftype boolC [val])
-(deftype idC [id])
-(deftype binC [op a b])
-(deftype ifC [cond truecase falsecase])
-(deftype fnC [params body])
-(deftype appC [function arg])
+(deftype numC [val]
+  Object
+  (equals [a b] (= (.val a) (.val b))))
+(deftype boolC [val]
+  Object
+  (equals [a b] (= (.val a) (.val b))))
+(deftype idC [id]
+  Object
+  (equals [a b] (= (.id a) (.id b))))
+(deftype binC [op a b]
+  Object
+  (equals [a b] (and (and (= (.op a) (.op b))
+                          (= (.a a) (.a b)))
+                     (= (.b a) (.b b)))))
+(deftype ifC [cond truecase falsecase]
+  Object
+  (equals [a b] (and (and (= (.cond a) (.cond b))
+                          (= (.truecase a) (.truecase b)))
+                     (= (.falsecase a) (.falsecase b)))))
+(deftype fnC [params body]
+  Object
+  (equals [a b] (and (= (.params a) (.params b))
+                     (= (.body a) (.body b)))))
+(deftype appC [function arg]
+  Object
+  (equals [a b] (and (= (.function a) (.function b))
+                     (= (.arg a) (.arg b)))))
 (derive ::numC ::ExprC)
 (derive ::boolC ::ExprC)
 (derive ::idC ::ExprC)
@@ -46,6 +61,10 @@
              '/ (fn [a b] (numV. (/ a b))),
              '<= (fn [a b] (numV. (<= a b))),
              'eq? (fn [a b] (boolV. (= a b)))))
+
+;;;;;;;;;;;;;;
+;;; PARSER ;;;
+;;;;;;;;;;;;;;
 
 ;;; Parses a list of values and returns a list of ExprCs.
 (defn parseList [l]
@@ -103,16 +122,9 @@
 (extractArgs '((x = 2) (y = 3) x))
 (extractBody '(with (x = 2) (y = 3) x))
 
-(testType (parse '1) numC)
-(testValue (.val (parse '1)) 1)
-(testType (parse 'true) boolC)
-(testValue (.val (parse 'true)) true)
-(testType (parse 'x) idC)
-(testValue (.id (parse 'x)) 'x)
-(testType (parse '(if true 1 2)) ifC)
-(testValue (.val (.cond (parse '(if true 1 2)))) true)
-(testValue (.val (.truecase (parse '(if true 1 2)))) 1)
-(testValue (.val (.falsecase (parse '(if true 1 2)))) 2)
+;;;;;;;;;;;;;;;;;;;
+;;; INTERPRETER ;;;
+;;;;;;;;;;;;;;;;;;;
 
 ;;; Processes a list of arguments.
 (defn processArgs [args env]
@@ -158,6 +170,10 @@
 (bind '() '() {})
 (bind (list 'x 'y) (processArgs (list (numC. 1) (numC. 2)) (hash-map)) {})
 (processArgs '() (hash-map))
+
+;;;;;;;;;;;;;;;;
+;;; TOP-EVAL ;;;
+;;;;;;;;;;;;;;;;
 
 ;;; Serializes a Value into a primitive value.
 (defn serialize [value]
