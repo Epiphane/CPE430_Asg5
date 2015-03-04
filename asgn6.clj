@@ -73,8 +73,10 @@
   (cond
     (list? s)
       (cond
-        (= (symbol 'if) (first s)) (ifC. (parse (nth s 1)) (parse (nth s 2)) (parse (nth s 3)))
-        (= (symbol 'fn) (first s)) (fnC. (nth s 1) (parse (nth s 2)))
+        (= (symbol 'if) (first s)) 
+          (ifC. (parse (nth s 1)) (parse (nth s 2)) (parse (nth s 3)))
+        (= (symbol 'fn) (first s)) 
+          (fnC. (nth s 1) (parse (nth s 2)))
         (= (symbol 'with) (first s))
           (let [params (extractParams (rest s))
                 args (extractArgs (rest s))
@@ -157,21 +159,33 @@
 ;;; Serializes a Value into a primitive value.
 (defn serialize [value]
   (cond
-    (= numV (type value)) (.val value)
-    (= boolV (type value)) (.val value)
+    (= numV (type value)) (str (.val value))
+    (= boolV (type value)) (str (.val value))
     (= closV (type value)) "#<procedure>"))
 
 (defn top-eval [s]
   (serialize (interp (parse s) (hash-map))))
 
-(testValue (serialize (interp (idC. 'x) (assoc (hash-map) 'x (numV. 1)))) 1)
+(assert (= (serialize (interp (idC. 'x) (assoc (hash-map) 'x (numV. 1)))) "1"))
 
-(testValue (top-eval '(if true 1 2)) 1)
-(testValue (top-eval '(if false 1 2)) 2)
-(testValue (top-eval '((fn (x) (+ x 1)) 2)) 3)
-(testValue (top-eval '(fn (x) x)) "#<procedure>")
-(testValue (top-eval '(+ 1 2)) 3)
-(testValue (top-eval '(with (x = 2) ((fn (y) (+ y 1)) x))) 3)
-(testValue (top-eval '((fn (x y) x) 1)) 1)
-(testValue (top-eval '((fn (x y) (+ x y)) 1 2)) 3)
-(testValue (top-eval '(with (x = 2) (y = 5) (+ x y))) 7)
+(assert (= (top-eval '(if true 1 2)) "1"))
+(assert (= (top-eval '(if false 1 2)) "2"))
+(assert (= (top-eval '((fn (x) (+ x 1)) 2)) "3"))
+(assert (= (top-eval '(fn (x) x)) "#<procedure>"))
+(assert (= (top-eval '(+ 1 2)) "3"))
+(assert (= (top-eval '(with (x = 2) ((fn (y) (+ y 1)) x))) "3"))
+(assert (= (top-eval '((fn (x y) x) 1)) "1"))
+(assert (= (top-eval '((fn (x y) (+ x y)) 1 2)) "3"))
+(assert (= (top-eval '(with (x = 2) (y = 5) (+ x y))) "7"))
+
+(assert (= (top-eval '5) "5"))
+(assert (= (top-eval 'true) "true"))
+(assert (= (top-eval 'false) "false"))
+(assert (= (top-eval '(* 4 2)) "8"))
+(assert (= (top-eval '(+ 1 2)) "3"))
+(assert (= (top-eval '(- 5 4)) "1"))
+(assert (= (top-eval '(+ 3 7)) "10"))
+(assert (= (top-eval '(/ 6 2)) "3"))
+(assert (= (top-eval '(<= 3 1)) "false"))
+(assert (= (top-eval '(<= -1 1)) "true"))
+(assert (= (top-eval '(* (+ 1 1) (- 6 (/ 4 2)))) "8"))

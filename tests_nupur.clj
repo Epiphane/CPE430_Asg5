@@ -1,24 +1,24 @@
 (ns tests_nupur)
 
-(defn top-eval [x]
-	(str x))
+(load-file "asgn6.clj")
 
-; Notes: Cannot use {} becuase it represents a map
-(assert (= (top-eval `5) "5"))
-(assert (= (top-eval `true) "true"))
-(assert (= (top-eval `false) "false"))
-(assert (= (top-eval `(* 4 2)) "8"))
-(assert (= (top-eval `(- 5 4)) "1"))
-(assert (= (top-eval `(+ 3 7)) "10"))
-(assert (= (top-eval `(/ 6 2)) "3"))
-(assert (= (top-eval `(<= 3 1)) "false"))
-(assert (= (top-eval `(<= -1 1)) "true"))
-(assert (= (top-eval `(* (+ 1 1) (- 6 (/ 4 2)))) "8"))
+(assert (= (top-eval '5) "5"))
+(assert (= (top-eval 'true) "true"))
+(assert (= (top-eval 'false) "false"))
+(assert (= (top-eval '(* 4 2)) "8"))
+(assert (= (top-eval '(+ 1 2)) "3"))
+(assert (= (top-eval '(- 5 4)) "1"))
+(assert (= (top-eval '(+ 3 7)) "10"))
+(assert (= (top-eval '(/ 6 2)) "3"))
+(assert (= (top-eval '(<= 3 1)) "false"))
+(assert (= (top-eval '(<= -1 1)) "true"))
+(assert (= (top-eval '(* (+ 1 1) (- 6 (/ 4 2)))) "8"))
 
-(assert (= (top-eval `(if false 2 3)) "3"))
-(assert (= (top-eval `(if true 1 2)) "1"))
-(assert (= (top-eval `(if true (+ 5 4) 2)) "9"))
-(assert (= (top-eval `(if false (+ 5 4) (/ 6 2))) "3"))
+
+(assert (= (top-eval '(if false 2 3)) "3"))
+(assert (= (top-eval '(if true 1 2)) "1"))
+(assert (= (top-eval '(if true (+ 5 4) 2)) "9"))
+(assert (= (top-eval '(if false (+ 5 4) (/ 6 2))) "3"))
 
 (comment
 ;(test (top-eval '{eq? 1 2}) "false")
